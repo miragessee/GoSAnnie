@@ -14,7 +14,7 @@ do
           Version = {
                 Path = SCRIPT_PATH,
                 Name = "miragesannie.version",
-                Url = "https://raw.githubusercontent.com/miragessee/GoSAkali/master/miragesannie.version"
+                Url = "https://raw.githubusercontent.com/miragessee/GoSAnnie/master/miragesannie.version"
           }
     }
     
