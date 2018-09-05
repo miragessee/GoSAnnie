@@ -2,50 +2,50 @@ if myHero.charName ~= "Annie" then return end
 
 -- [ update ]
 do
-      
-    local Version = 1
+    
+    local Version = 2
     
     local Files = {
-          Lua = {
-                Path = SCRIPT_PATH,
-                Name = "Annie.lua",
-                Url = "https://raw.githubusercontent.com/miragessee/GoSAnnie/master/Annie.lua"
-          },
-          Version = {
-                Path = SCRIPT_PATH,
-                Name = "miragesannie.version",
-                Url = "https://raw.githubusercontent.com/miragessee/GoSAnnie/master/miragesannie.version"
-          }
+        Lua = {
+            Path = SCRIPT_PATH,
+            Name = "Annie.lua",
+            Url = "https://raw.githubusercontent.com/miragessee/GoSAnnie/master/Annie.lua"
+        },
+        Version = {
+            Path = SCRIPT_PATH,
+            Name = "miragesannie.version",
+            Url = "https://raw.githubusercontent.com/miragessee/GoSAnnie/master/miragesannie.version"
+        }
     }
     
     local function AutoUpdate()
-          
-          local function DownloadFile(url, path, fileName)
-                DownloadFileAsync(url, path .. fileName, function() end)
-                while not FileExist(path .. fileName) do end
-          end
-          
-          local function ReadFile(path, fileName)
-                local file = io.open(path .. fileName, "r")
-                local result = file:read()
-                file:close()
-                return result
-          end
-          
-          DownloadFile(Files.Version.Url, Files.Version.Path, Files.Version.Name)
-          
-          local NewVersion = tonumber(ReadFile(Files.Version.Path, Files.Version.Name)) 
-          if NewVersion > Version then
-                DownloadFile(Files.Lua.Url, Files.Lua.Path, Files.Lua.Name)
-                print(Files.Version.Name .. ": Updated to " .. tostring(NewVersion) .. ". Please Reload with 2x F6")
-          else
-                print(Files.Version.Name .. ": No Updates Found")
-          end
-          
+        
+        local function DownloadFile(url, path, fileName)
+            DownloadFileAsync(url, path .. fileName, function() end)
+            while not FileExist(path .. fileName) do end
+        end
+        
+        local function ReadFile(path, fileName)
+            local file = io.open(path .. fileName, "r")
+            local result = file:read()
+            file:close()
+            return result
+        end
+        
+        DownloadFile(Files.Version.Url, Files.Version.Path, Files.Version.Name)
+        
+        local NewVersion = tonumber(ReadFile(Files.Version.Path, Files.Version.Name))
+        if NewVersion > Version then
+            DownloadFile(Files.Lua.Url, Files.Lua.Path, Files.Lua.Name)
+            print(Files.Version.Name .. ": Updated to " .. tostring(NewVersion) .. ". Please Reload with 2x F6")
+        else
+            print(Files.Version.Name .. ": No Updates Found")
+        end
+    
     end
     
     AutoUpdate()
-    
+
 end
 
 local _atan = math.atan2
@@ -348,9 +348,11 @@ function VectorPointProjectionOnLineSegment(v1, v2, v)
     return pointSegment, pointLine, isOnSegment
 end
 
-local Version, Author, LVersion = "v1", "miragessee", "8.17"
+local Version, Author, LVersion = "v2", "miragessee", "8.17"
 
 function Annie:LoadMenu()
+    
+    self.previousMinHealtEnemy = nil
     
     self.Collision = nil
     
@@ -999,21 +1001,28 @@ function Annie:Tibbers()
                 end
             end
             
-            if minHealthEnemy then
-                if not IsImmune(minHealthEnemy) then
-                    if IsReady(_R) and GetSpellRName() == "AnnieRController" and (self.Collision == false or self.CollisionSpellName == "YasuoWMovingWall") then
-                        if ValidTarget(minHealthEnemy, 2100) then
-                            DelayAction(function()
-                                LocalControlCastSpell(HK_R, minHealthEnemy)
-                            end, 0.4)
-                            if self.AnnieMenu.Tibbers.UseET:Value() then
-                                if IsReady(_E) then
-                                    LocalControlCastSpell(HK_E)
+            if self.previousMinHealtEnemy == minHealthEnemy then
+            
+            else
+                
+                if minHealthEnemy then
+                    if not IsImmune(minHealthEnemy) then
+                        if IsReady(_R) and GetSpellRName() == "AnnieRController" and (self.Collision == false or self.CollisionSpellName == "YasuoWMovingWall") then
+                            if ValidTarget(minHealthEnemy, 2100) then
+                                DelayAction(function()
+                                    LocalControlCastSpell(HK_R, minHealthEnemy)
+                                end, 0.4)
+                                if self.AnnieMenu.Tibbers.UseET:Value() then
+                                    if IsReady(_E) then
+                                        LocalControlCastSpell(HK_E)
+                                    end
                                 end
                             end
                         end
                     end
                 end
+
+                self.previousMinHealtEnemy = minHealthEnemy
             end
         end
     end
